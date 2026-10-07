@@ -57,10 +57,12 @@ const patchGame = (id: string, fn: (g: Game) => Game) =>
 
 /* ---------------- actions ---------------- */
 export const actions = {
-  addPlayer(name: string) {
+  addPlayer(name: string): string | undefined {
     const n = name.trim();
     if (!n) return;
-    set((s) => ({ ...s, players: [...s.players, { id: uid(), name: n, createdAt: Date.now() }] }));
+    const id = uid();
+    set((s) => ({ ...s, players: [...s.players, { id, name: n, createdAt: Date.now() }] }));
+    return id;
   },
   removePlayer(id: string) {
     set((s) => ({ ...s, players: s.players.filter((p) => p.id !== id) }));

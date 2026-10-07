@@ -87,7 +87,8 @@ export function NewGameForm({ players, settings }: { players: Player[]; settings
               onSubmit={(e) => {
                 e.preventDefault();
                 if (!guest.trim()) return;
-                actions.addPlayer(guest);
+                const id = actions.addPlayer(guest);
+                if (id) setPicked((p) => [...p, id]);
                 setGuest("");
               }}
             >
@@ -117,6 +118,13 @@ export function NewGameForm({ players, settings }: { players: Player[]; settings
       >
         Start game
       </button>
+      {picked.length === 0 && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          {players.length === 0
+            ? "Type a name in “+ new player” and press Enter to add someone."
+            : "Tap at least one player above to seat them at the table."}
+        </p>
+      )}
     </div>
   );
 }
