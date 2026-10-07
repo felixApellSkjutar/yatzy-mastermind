@@ -139,4 +139,4 @@ export const maxi: BoardLayout = {
 /** Register new layouts here — everything else picks them up automatically. */
 export const LAYOUTS: BoardLayout[] = [scandinavian, yahtzee, maxi];
 
-export const getLayout = (id: string) => LAYOUTS.find((l) => l.id === id) ?? LAYOUTS[0];
+export const getLayout = (id: string) => LAYOUTS.find((l) => l.id === id) ?? LAYOUTS[0]!;

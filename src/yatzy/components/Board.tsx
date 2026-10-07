@@ -21,7 +21,7 @@ export function Board({ game, players, settings }: Props) {
   const [open, setOpen] = useState<{ pid: string; cid: string } | null>(null);
   useEffect(() => setRound(liveRound), [liveRound, game.id]);
 
-  const sheet = game.sheets[round];
+  const sheet = game.sheets[round] ?? game.sheets[0]!;
   const turn = currentPlayerId(layout, game);
   const finished = game.status === "finished";
   const hide = settings.blurTotals && !finished;

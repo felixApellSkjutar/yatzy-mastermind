@@ -45,4 +45,4 @@ export const STRATEGIES: ScoringStrategy[] = [
   },
 ];
 
-export const getStrategy = (id: string) => STRATEGIES.find((s) => s.id === id) ?? STRATEGIES[0];
+export const getStrategy = (id: string) => STRATEGIES.find((s) => s.id === id) ?? STRATEGIES[0]!;
