@@ -14,7 +14,7 @@ interface Props {
 export function ScoreEntryMenu({ layout, category, current, enabledHelpers, onPick, onClose }: Props) {
   const helpers = ENTRY_HELPERS.filter((h) => enabledHelpers.includes(h.id));
   const list = helpers.length ? helpers : ENTRY_HELPERS.slice(-1);
-  const [tab, setTab] = useState(list[0].id);
+  const [tab, setTab] = useState(list[0]!.id);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export function ScoreEntryMenu({ layout, category, current, enabledHelpers, onPi
     };
   }, [onClose]);
 
-  const Active = (list.find((h) => h.id === tab) ?? list[0]).Component;
+  const Active = (list.find((h) => h.id === tab) ?? list[0]!).Component;
 
   return (
     <div

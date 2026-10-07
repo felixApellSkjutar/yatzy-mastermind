@@ -47,8 +47,8 @@ export interface Game {
   status: GameStatus;
   createdAt: number;
   updatedAt: number;
-  finalTotals?: Record<string, number>;
-  winnerIds?: string[];
+  finalTotals?: Record<string, number> | undefined;
+  winnerIds?: string[] | undefined;
 }
 
 export interface Player {

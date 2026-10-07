@@ -23,7 +23,7 @@ export const isGameComplete = (layout: BoardLayout, game: Game) =>
 /** Next in turn = the player with fewest filled cells in the current round (seat order breaks ties). */
 export const currentPlayerId = (layout: BoardLayout, game: Game): string | null => {
   if (isGameComplete(layout, game)) return null;
-  const sheet = game.sheets[currentRoundIndex(layout, game)];
+  const sheet = game.sheets[currentRoundIndex(layout, game)]!;
   let best: string | null = null;
   let min = Infinity;
   for (const pid of game.playerIds) {

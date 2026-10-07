@@ -43,8 +43,8 @@ export const scorers = {
 };
 
 const upper = (n: number, diceCount: number): Category => ({
-  id: ["", "ones", "twos", "threes", "fours", "fives", "sixes"][n],
-  label: ["", "Ones", "Twos", "Threes", "Fours", "Fives", "Sixes"][n],
+  id: ["", "ones", "twos", "threes", "fours", "fives", "sixes"][n]!,
+  label: ["", "Ones", "Twos", "Threes", "Fours", "Fives", "Sixes"][n]!,
   sectionId: "upper",
   options: Array.from({ length: diceCount + 1 }, (_, i) => i * n),
   score: scorers.face(n),

@@ -38,7 +38,7 @@ export const STRATEGIES: ScoringStrategy[] = [
         .forEach((s) => {
           const totals = game.playerIds.map((pid) => roundTotal(layout, s, pid));
           const max = Math.max(...totals);
-          game.playerIds.forEach((pid, i) => totals[i] === max && (res[pid] += 1));
+          game.playerIds.forEach((pid, i) => totals[i] === max && (res[pid] = (res[pid] ?? 0) + 1));
         });
       return res;
     },
