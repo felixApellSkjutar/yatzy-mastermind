@@ -34,7 +34,7 @@ function Index() {
       <div className="pointer-events-none absolute -bottom-48 -right-28 h-[520px] w-[520px] rounded-full bg-accent/10 blur-3xl" />
 
       <div className="relative z-10 mx-auto max-w-[1400px] px-6 py-8">
-        <header className="mb-8 flex flex-wrap items-end justify-between gap-6">
+        <header className="relative z-20 mb-8 flex flex-wrap items-end justify-between gap-6">
           <div className="animate-rise">
             <h1 className="font-display text-3xl font-medium italic tracking-tight">
               Yatzy<span className="font-semibold not-italic text-primary">.Tray</span>
