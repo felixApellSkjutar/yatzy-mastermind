@@ -41,7 +41,10 @@ export interface Game {
   name: string;
   layoutId: string;
   strategyId: string;
+  /** Account ids, or guest ids (prefixed "g_") whose names live in `guests`. */
   playerIds: string[];
+  guests?: Record<string, string> | undefined;
+  ownerId?: string | undefined;
   rounds: number;
   sheets: RoundSheet[];
   status: GameStatus;
@@ -55,6 +58,7 @@ export interface Player {
   id: string;
   name: string;
   createdAt: number;
+  guest?: boolean;
 }
 
 export interface Settings {
@@ -66,9 +70,24 @@ export interface Settings {
   blurTotals: boolean;
 }
 
+export interface Me {
+  id: string;
+  email: string;
+  displayName: string;
+  isAdmin: boolean;
+  settings: Partial<Settings> | null;
+}
+
 export interface AppState {
+  /** "loading" until the session is known. */
+  status: "loading" | "signedOut" | "ready";
+  me: Me | null;
+  /** Registered accounts plus guests seen in your games. */
   players: Player[];
+  /** Games you host or play in. */
   games: Game[];
+  /** All finished games, for global highscores. */
+  statsGames: Game[];
   activeGameId: string | null;
   settings: Settings;
 }
