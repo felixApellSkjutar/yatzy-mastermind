@@ -54,7 +54,9 @@ function withGuests(s: AppState): AppState {
 const errorListeners = new Set<(msg: string) => void>();
 export const onStoreError = (fn: (msg: string) => void) => {
   errorListeners.add(fn);
-  return () => errorListeners.delete(fn);
+  return () => {
+    errorListeners.delete(fn);
+  };
 };
 const report = (e: unknown) => errorListeners.forEach((l) => l(e instanceof Error ? e.message : "Something went wrong"));
 
