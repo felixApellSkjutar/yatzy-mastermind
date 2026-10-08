@@ -26,10 +26,8 @@ export function boxValue(ctx: Ctx, cid: string, dice: Dice): number {
   const pts = cat.score?.(dice) ?? 0;
   const bonus = ctx.layout.bonuses.find((b) => b.sectionId === cat.sectionId);
   if (bonus && ctx.upperSoFar < bonus.threshold) {
-    const face = pts / Math.max(1, dice.filter((d) => d * dice.filter((x) => x === d).length === pts).length || 1);
     const faceVal = ["ones", "twos", "threes", "fours", "fives", "sixes"].indexOf(cid) + 1;
     if (faceVal > 0 && pts >= faceVal * 3) return pts + bonus.value * 0.1;
-    void face;
   }
   return pts;
 }
