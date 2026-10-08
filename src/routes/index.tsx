@@ -2,6 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Board } from "@/yatzy/components/Board";
+import { AdvisorButton } from "@/yatzy/components/AdvisorButton";
 import { ImportLegacy } from "@/yatzy/components/ImportLegacy";
 import { NewGameForm } from "@/yatzy/components/NewGameForm";
 import { SettingsPanel } from "@/yatzy/components/SettingsPanel";
@@ -92,7 +93,7 @@ function Index() {
             <div className="flex flex-col items-start gap-6 lg:flex-row">
               <main className="w-full min-w-0 flex-1 animate-rise" style={{ animationDelay: "200ms" }}>
                 {game ? (
-                  <Board game={game} players={state.players} settings={state.settings} />
+                  <><Board game={game} players={state.players} settings={state.settings} /><AdvisorButton key={game.id} game={game} players={state.players} /></>
                 ) : (
                   <NewGameForm
                     key={state.settings.defaultLayoutId + state.settings.defaultRounds}

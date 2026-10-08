@@ -152,6 +152,31 @@ export const saveSettings = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/* ---------------- move advisor ---------------- */
+export const getAdvice = createServerFn({ method: "POST" })
+  .inputValidator((d) =>
+    z
+      .object({
+        layoutId: z.string().max(64),
+        dice: z.array(z.number().int().min(1).max(6)).min(1).max(6),
+        rollsLeft: z.number().int().min(0).max(2),
+        open: z.array(z.string().max(64)).max(40),
+        upperSoFar: z.number().int().min(0).max(1000),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const [, auth] = await server();
+    auth.requireUser();
+    const { LAYOUTS } = await import("@/yatzy/layouts");
+    const { advise } = await import("@/yatzy/advisor");
+    const layout = LAYOUTS.find((l) => l.id === data.layoutId);
+    if (!layout) throw new Error("Unknown board layout.");
+    if (data.dice.length !== layout.diceCount) throw new Error(`Enter ${layout.diceCount} dice.`);
+    const open = data.open.filter((id) => layout.categories.some((c) => c.id === id));
+    return advise(layout, data.dice, data.rollsLeft, open, data.upperSoFar);
+  });
+
 /* ---------------- admin ---------------- */
 export const adminOverview = createServerFn({ method: "GET" }).handler(async () => {
   const [db, auth] = await server();
