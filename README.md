@@ -27,3 +27,25 @@ npm run dev
 - TypeScript
 - React
 - Tailwind CSS
+
+## Self-hosting (no cloud needed)
+
+Yatzy.Tray stores everything in one local SQLite file (Node 22.13+ built-in `node:sqlite`). Accounts, sessions and roles are handled by the app itself.
+
+**Run with Docker (home server / Raspberry Pi):**
+
+```sh
+docker compose up -d --build   # http://<your-machine>:3000
+```
+
+Data lives in `./data/yatzy.db`. Back up by copying that file.
+
+**Run directly with Node:**
+
+```sh
+npm install
+NITRO_PRESET=node-server npm run build
+DATABASE_FILE=./data/yatzy.db PORT=3000 node .output/server/index.mjs
+```
+
+The first account that signs up becomes the admin (`/admin`). Admins can reset passwords, manage roles, and delete players or games. Put it behind HTTPS (e.g. Caddy) if you open it to the internet.
