@@ -16,3 +16,4 @@
 - Auth is self-built (src/lib/auth.server.ts): scrypt password hashes, hashed session tokens in a sessions table, httpOnly cookie; roles live in user_roles, never on users. Every server function checks the caller itself. Why: no external auth provider, no privilege escalation.
 - Game completion/winners are recomputed server-side with the shared finalizeGame (src/yatzy/finalize.ts). Why: highscores can't be faked by the client.
 - Self-hosting builds with NITRO_PRESET=node-server (see README). Why: the default edge target has no SQLite/filesystem.
+- Move advisor (src/yatzy/advisor.ts) is a pure expectimax over kept dice, reusing layout category scorers; it is called through the getAdvice server function. Why: works for any registered layout, keeps compute off the client.
