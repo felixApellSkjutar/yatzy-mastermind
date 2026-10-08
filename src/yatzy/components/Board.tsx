@@ -26,6 +26,7 @@ export function Board({ game, players, settings }: Props) {
   const finished = game.status === "finished";
   const hide = settings.blurTotals && !finished;
   const totals = strategy.compute(layout, game);
+  const editable = actions.canEdit(game);
   const nameOf = (pid: string) => players.find((p) => p.id === pid)?.name ?? "Unknown";
   const cols = `minmax(140px,1.2fr) repeat(${game.playerIds.length}, minmax(64px,1fr))`;
 
@@ -95,6 +96,7 @@ export function Board({ game, players, settings }: Props) {
                       return (
                         <div key={pid} className="relative">
                           <button
+                            disabled={!editable}
                             onClick={() => setOpen(isOpen ? null : { pid, cid: cat.id })}
                             className={`w-full rounded-xl py-2 text-center font-mono ring-1 transition-colors ${
                               isOpen
