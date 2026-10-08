@@ -6,12 +6,19 @@ import type { Player, Settings } from "../types";
 
 const field = "w-full rounded-xl bg-panel px-3 py-2 text-sm ring-1 ring-border outline-none focus:ring-primary/50";
 
-export function NewGameForm({ players, settings }: { players: Player[]; settings: Settings }) {
+export function NewGameForm({ players: all, settings, meId }: { players: Player[]; settings: Settings; meId?: string | undefined }) {
+  const [guests, setGuests] = useState<Record<string, string>>({});
+  const [query, setQuery] = useState("");
   const [name, setName] = useState("");
   const [layoutId, setLayoutId] = useState(settings.defaultLayoutId);
   const [strategyId, setStrategyId] = useState(settings.defaultStrategyId);
   const [rounds, setRounds] = useState(settings.defaultRounds);
-  const [picked, setPicked] = useState<string[]>([]);
+  const [picked, setPicked] = useState<string[]>(meId ? [meId] : []);
+  const accounts = all.filter((p) => !p.guest);
+  const players: Player[] = [
+    ...accounts.filter((p) => picked.includes(p.id) || !query || p.name.toLowerCase().includes(query.toLowerCase())),
+    ...Object.entries(guests).map(([id, name]) => ({ id, name: `${name} (guest)`, createdAt: 0, guest: true })),
+  ];
   const [guest, setGuest] = useState("");
 
   const toggle = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
@@ -66,6 +73,9 @@ export function NewGameForm({ players, settings }: { players: Player[]; settings
         </label>
         <div className="space-y-2 md:col-span-2">
           <span className="eyebrow">Players · seat order follows your picks</span>
+          {accounts.length > 8 && (
+            <input className={field} placeholder="Search registered players" value={query} onChange={(e) => setQuery(e.target.value)} />
+          )}
           <div className="flex flex-wrap gap-2">
             {players.map((p) => {
               const i = picked.indexOf(p.id);
@@ -87,14 +97,15 @@ export function NewGameForm({ players, settings }: { players: Player[]; settings
               onSubmit={(e) => {
                 e.preventDefault();
                 if (!guest.trim()) return;
-                const id = actions.addPlayer(guest);
-                if (id) setPicked((p) => [...p, id]);
+                const id = actions.newGuestId();
+                setGuests((g) => ({ ...g, [id]: guest.trim().slice(0, 40) }));
+                setPicked((p) => [...p, id]);
                 setGuest("");
               }}
             >
               <input
                 className="w-32 rounded-full bg-panel px-3 py-1.5 text-xs ring-1 ring-border outline-none"
-                placeholder="+ new player"
+                placeholder="+ guest (no account)"
                 value={guest}
                 onChange={(e) => setGuest(e.target.value)}
               />
@@ -112,6 +123,7 @@ export function NewGameForm({ players, settings }: { players: Player[]; settings
             strategyId,
             rounds,
             playerIds: picked,
+            guests: Object.fromEntries(Object.entries(guests).filter(([id]) => picked.includes(id))),
           })
         }
         className="mt-8 rounded-full bg-primary px-6 py-2.5 text-sm text-primary-foreground transition-opacity disabled:opacity-40"
@@ -120,9 +132,7 @@ export function NewGameForm({ players, settings }: { players: Player[]; settings
       </button>
       {picked.length === 0 && (
         <p className="mt-2 text-xs text-muted-foreground">
-          {players.length === 0
-            ? "Type a name in “+ new player” and press Enter to add someone."
-            : "Tap at least one player above to seat them at the table."}
+Tap at least one player above, or type a guest name and press Enter.
         </p>
       )}
     </div>
