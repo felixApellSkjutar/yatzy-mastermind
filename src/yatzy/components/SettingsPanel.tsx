@@ -85,13 +85,14 @@ export function SettingsPanel({ settings }: { settings: Settings }) {
             className="space-y-1.5 border-t pt-3"
             onSubmit={async (e) => {
               e.preventDefault();
-              const f = new FormData(e.currentTarget);
+              const form = e.currentTarget;
+              const f = new FormData(form);
               try {
                 const r = await changePassword({ data: { current: String(f.get("current")), next: String(f.get("next")) } });
                 if (r.error) toast.error(r.error);
                 else {
                   toast.success("Password changed");
-                  e.currentTarget.reset();
+                  form.reset();
                 }
               } catch {
                 toast.error("New password must be at least 8 characters");
