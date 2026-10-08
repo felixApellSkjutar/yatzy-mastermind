@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { getLayout } from "../layouts";
 import { currentPlayerId, currentRoundIndex } from "../logic";
 import { actions } from "../store";
@@ -13,10 +13,9 @@ const Card = ({ title, children, delay }: { title: string; children: React.React
 );
 
 function PlayersCard({ state }: { state: AppState }) {
-  const [name, setName] = useState("");
   const game = state.games.find((g) => g.id === state.activeGameId);
   const turn = game ? currentPlayerId(getLayout(game.layoutId), game) : null;
-  const list = game ? game.playerIds.map((id) => state.players.find((p) => p.id === id)!).filter(Boolean) : state.players;
+  const list = game ? game.playerIds.map((id) => state.players.find((p) => p.id === id)!).filter(Boolean) : state.players.filter((p) => !p.guest);
 
   return (
     <Card title={`${game ? "At the table" : "Players"} · ${list.length}`} delay={280}>
@@ -36,36 +35,11 @@ function PlayersCard({ state }: { state: AppState }) {
                 <div>{p.name}</div>
                 {game && <div className={`font-mono text-[10px] ${on ? "text-primary" : "text-muted-foreground"}`}>{on ? "on turn" : "waiting"}</div>}
               </div>
-              {!game && (
-                <button
-                  onClick={() => actions.removePlayer(p.id)}
-                  className="text-[11px] text-muted-foreground opacity-0 hover:text-destructive group-hover:opacity-100"
-                >
-                  Remove
-                </button>
-              )}
+              {p.id === state.me?.id && <span className="font-mono text-[10px] text-muted-foreground">you</span>}
             </div>
           );
         })}
       </div>
-      {!game && (
-        <form
-          className="mt-3 flex gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            actions.addPlayer(name);
-            setName("");
-          }}
-        >
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Register player"
-            className="w-full rounded-xl bg-panel px-3 py-1.5 text-xs ring-1 ring-border outline-none focus:ring-primary/50"
-          />
-          <button className="rounded-full bg-primary px-3 text-xs text-primary-foreground">Add</button>
-        </form>
-      )}
     </Card>
   );
 }
@@ -87,12 +61,12 @@ function SavedGamesCard({ state }: { state: AppState }) {
                 {g.status} · board {currentRoundIndex(layout, g) + 1}/{g.rounds}
               </div>
             </button>
-            <button
+            {actions.canEdit(g) && <button
               onClick={() => actions.deleteGame(g.id)}
               className="text-[11px] text-muted-foreground opacity-0 hover:text-destructive group-hover:opacity-100"
             >
               Delete
-            </button>
+            </button>}
           </div>
         );
       })}
@@ -101,7 +75,7 @@ function SavedGamesCard({ state }: { state: AppState }) {
 }
 
 function HighscoresCard({ state }: { state: AppState }) {
-  const stats = useMemo(() => computeStats(state.players, state.games), [state.players, state.games]);
+  const stats = useMemo(() => computeStats(state.players.filter((p) => !p.guest), state.statsGames), [state.players, state.statsGames]);
   const ranked = [...stats].filter((s) => s.played > 0).sort((a, b) => b.best - a.best);
   const topStreak = [...stats].sort((a, b) => b.winStreak - a.winStreak)[0];
   return (
