@@ -19,13 +19,18 @@
 ```
 
 ## Technical details
-- Enable Lovable Cloud and turn on email auth.
-- Tables (all with GRANTs and row-level security):
-  - `profiles` (id = auth user, display_name unique, settings jsonb), auto-created on signup by a trigger.
-  - `user_roles` + `has_role()` security-definer function (enum `app_role`: admin, user). A trigger makes the first signup an admin.
-  - `games` (id, owner_id, name, layout_id, strategy_id, rounds, status, sheets jsonb, final_totals jsonb, winner_ids, timestamps).
-  - `game_players` (game_id, seat, profile_id nullable, guest_name nullable).
-  - RLS: everyone signed in can read profiles; games are visible to the owner, participants and admins; only the owner or an admin can write. Admins can manage everything.
-- Store refactor: keep the same `useAppState()` / `actions` API in `src/yatzy/store.ts`, but back it with TanStack Query + the Cloud client. Score edits update optimistically and are saved with a short debounce. Turn order and totals stay derived. Layout/strategy/helper registries stay unchanged.
+- Fully self-hosted, no cloud services: the app runs as one Node server (TanStack Start Node build) with a local SQLite database file (e.g. `data/yatzy.db`). It works on localhost, a Raspberry Pi or a home server. A `Dockerfile` + `docker-compose.yml` and a README section cover home hosting and backups (copy the db file).
+- Database access with Drizzle ORM + `better-sqlite3`. Migrations run automatically on startup. Swapping to a local Postgres later is a config change.
+- Own auth: passwords hashed with Node `crypto.scrypt`, server-side `sessions` table, httpOnly secure session cookie. Email confirmation and password reset by email only work if SMTP settings are provided (optional env vars). Otherwise an admin can reset a user's password from `/admin`.
+- Tables:
+  - `users` (id, email unique, password_hash, display_name unique, settings json, created_at).
+  - `user_roles` (user_id, role: admin | user), kept separate from users. The first registered account becomes admin.
+  - `sessions` (id, user_id, expires_at).
+  - `games` (id, owner_id, name, layout_id, strategy_id, rounds, status, sheets json, final_totals json, winner_ids, timestamps).
+  - `game_players` (game_id, seat, user_id nullable, guest_name nullable).
+  - Access rules, enforced in server functions on every request: everyone signed in can read profiles; games are visible to the owner, participants and admins; only the owner or an admin can write. Admin checks read `user_roles` server-side.
+- All data access goes through `createServerFn` functions (`*.functions.ts`), with the db code kept in `*.server.ts`.
+- Store refactor: keep the same `useAppState()` / `actions` API in `src/yatzy/store.ts`, but back it with TanStack Query + the app's own server functions. Score edits update optimistically and are saved with a short debounce. Turn order and totals stay derived. Layout/strategy/helper registries stay unchanged.
 - `stats.ts` reads finished games from the database and ignores guest seats.
-- Update `AGENTS.md`: the store is now Cloud-backed, and localStorage is only used for the one-time import.
+- Note: the Lovable preview environment can't run a native SQLite server. The preview will use a pure-JS SQLite fallback, or the full app can be tested by running it locally.
+- Update `AGENTS.md`: the store is now backed by a self-hosted database through server functions, and localStorage is only used for the one-time import.
