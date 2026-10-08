@@ -81,6 +81,28 @@ export function SettingsPanel({ settings }: { settings: Settings }) {
             <span>Blur totals until game over</span>
             <input type="checkbox" checked={settings.blurTotals} onChange={(e) => actions.updateSettings({ blurTotals: e.target.checked })} className="accent-primary" />
           </label>
+          <form
+            className="space-y-1.5 border-t pt-3"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const f = new FormData(e.currentTarget);
+              try {
+                const r = await changePassword({ data: { current: String(f.get("current")), next: String(f.get("next")) } });
+                if (r.error) toast.error(r.error);
+                else {
+                  toast.success("Password changed");
+                  e.currentTarget.reset();
+                }
+              } catch {
+                toast.error("New password must be at least 8 characters");
+              }
+            }}
+          >
+            <span className="eyebrow">Change password</span>
+            <input name="current" type="password" placeholder="Current password" className={field} required autoComplete="current-password" />
+            <input name="next" type="password" placeholder="New password (8+)" className={field} required minLength={8} autoComplete="new-password" />
+            <button className="rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground">Update</button>
+          </form>
         </div>
       )}
     </div>
